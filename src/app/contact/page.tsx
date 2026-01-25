@@ -20,7 +20,6 @@ import {
   Youtube,
 } from 'lucide-react';
 import { useState } from 'react';
-import { SocialLinks } from '../../../scripts/seed';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -113,7 +112,7 @@ export default function ContactPage() {
     },
   ];
 
-  const socialLink = [
+  const socialLinks = [
     {
       name: 'WhatsApp',
       href: 'https://wa.me/263786974895',
