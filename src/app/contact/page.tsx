@@ -19,8 +19,8 @@ import {
   Twitter,
   Youtube,
 } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
+import { SocialLinks } from '../../../scripts/seed';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -113,7 +113,7 @@ export default function ContactPage() {
     },
   ];
 
-  const socialLinks = [
+  const socialLink = [
     {
       name: 'WhatsApp',
       href: 'https://wa.me/263786974895',
@@ -221,18 +221,16 @@ export default function ContactPage() {
           </CardHeader>
 
           <CardContent className='space-y-10'>
-            {status && (
+            {submitStatus && (
               <Alert
                 className={`${
-                  status === 'success'
+                  submitStatus.type === 'success'
                     ? 'border-green-300 bg-green-50'
                     : 'border-red-300 bg-red-50'
                 }`}
               >
                 <AlertDescription className='font-medium'>
-                  {status === 'success'
-                    ? 'Message sent successfully!'
-                    : 'Something went wrong. Please try again.'}
+                  {submitStatus.message}
                 </AlertDescription>
               </Alert>
             )}

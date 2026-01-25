@@ -76,13 +76,23 @@ export function getDefaultMediaForProject(title: string): string {
   return DEFAULT_MEDIA.project_default;
 }
 
+interface MediaItem {
+  url: string;
+  type: 'image' | 'video';
+  publicId: string;
+}
+
+interface Project {
+  _id?: string;
+  title: string;
+  media?: MediaItem[];
+}
+
 /**
  * Ensure project has media
  * Adds default media if project has none
  */
-export function ensureProjectMedia(
-  project: any,
-): { url: string; type: 'image' | 'video'; publicId: string }[] {
+export function ensureProjectMedia(project: Project): MediaItem[] {
   if (project.media && project.media.length > 0) {
     return project.media;
   }
@@ -101,11 +111,7 @@ export function ensureProjectMedia(
  * Get single media item for project
  * Returns first media or default
  */
-export function getProjectThumbnail(project: any): {
-  url: string;
-  type: 'image' | 'video';
-  publicId: string;
-} {
+export function getProjectThumbnail(project: Project): MediaItem {
   const media = ensureProjectMedia(project);
   return media[0];
 }

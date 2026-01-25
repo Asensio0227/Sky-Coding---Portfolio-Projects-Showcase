@@ -1,12 +1,12 @@
 // Edge-compatible JWT verification using jose library
-import { jwtVerify, SignJWT } from 'jose';
+import { JWTPayload, jwtVerify, SignJWT } from 'jose';
 
 const JWT_SECRET =
   process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const secret = new TextEncoder().encode(JWT_SECRET);
 
 // Verify JWT token (Edge-compatible)
-export async function verifyJWTEdge(token: string): Promise<any> {
+export async function verifyJWTEdge(token: string): Promise<JWTPayload | null> {
   try {
     console.log('🔐 Verifying JWT (Edge)...');
 
@@ -28,7 +28,7 @@ export async function verifyJWTEdge(token: string): Promise<any> {
 }
 
 // Sign JWT token (Edge-compatible)
-export async function signJWTEdge(payload: any): Promise<string> {
+export async function signJWTEdge(payload: JWTPayload): Promise<string> {
   console.log('🔐 Signing JWT (Edge) with payload:', payload);
 
   const token = await new SignJWT(payload)

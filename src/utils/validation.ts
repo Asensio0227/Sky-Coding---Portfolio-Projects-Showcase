@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export interface ApiError {
   message: string;
@@ -13,7 +13,7 @@ export function createErrorResponse(
 }
 
 export function createSuccessResponse(
-  data: any,
+  data: Record<string, unknown>,
   statusCode: number = 200,
 ): NextResponse {
   return NextResponse.json(data, { status: statusCode });
@@ -39,7 +39,19 @@ export function getMediaTypeFromContentType(
   return null;
 }
 
-export function validateProjectData(data: any): {
+interface MediaItem {
+  url?: string;
+  type?: string;
+  publicId?: string;
+}
+
+interface ProjectData {
+  title?: string;
+  description?: string;
+  media?: MediaItem[];
+}
+
+export function validateProjectData(data: ProjectData): {
   valid: boolean;
   errors: string[];
 } {
@@ -79,7 +91,13 @@ export function validateProjectData(data: any): {
   };
 }
 
-export function validateUserData(data: any): {
+interface UserData {
+  name?: string;
+  email?: string;
+  bio?: string;
+}
+
+export function validateUserData(data: UserData): {
   valid: boolean;
   errors: string[];
 } {

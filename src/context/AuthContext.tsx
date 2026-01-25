@@ -2,6 +2,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
+import { SocialLinks } from '../../scripts/seed';
 
 type User = {
   id: string;
@@ -9,7 +10,7 @@ type User = {
   email: string;
   role: 'admin' | 'user';
   bio?: string;
-  socialLinks?: any;
+  socialLinks?: SocialLinks;
 };
 
 type AuthContextType = {

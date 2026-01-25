@@ -3,6 +3,12 @@ import { Project, User } from '@/models';
 import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGO_URL || '';
+export interface SocialLinks {
+  whatsapp: string;
+  facebook: string;
+  instagram: string;
+  twitter: string;
+}
 
 const DEFAULT_PROJECTS = [
   {
@@ -130,7 +136,7 @@ async function seedDatabase() {
       console.log(`✓ Created ${projects.length} default projects`);
 
       // Add projects to admin user
-      admin.projects = projects.map((p: any) => p._id);
+      admin.projects = projects.map((p) => p._id);
       await admin.save();
       console.log('✓ Associated projects with admin user');
     } else {
@@ -187,7 +193,9 @@ export async function ensureDefaultContent() {
       }
 
       // Add projects to admin user
-      admin.projects = projects.map((p: any) => p._id);
+      admin.projects = projects.map(
+        (p: mongoose.Document & { _id: mongoose.Types.ObjectId }) => p._id,
+      );
       await admin.save();
       console.log('✅ Associated projects with admin user');
     } else {
