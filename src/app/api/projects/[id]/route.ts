@@ -28,11 +28,14 @@ async function verifyAdmin(request: NextRequest) {
 // GET single project
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    // Await params in Next.js 15+
+    const { id } = await params;
+
     await connectDB();
-    const project = await Project.findById(params.id);
+    const project = await Project.findById(id);
 
     if (!project) {
       return createErrorResponse('Project not found', 404);
@@ -53,9 +56,12 @@ export async function GET(
 // DELETE project (admin only)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    // Await params in Next.js 15+
+    const { id } = await params;
+
     const auth = await verifyAdmin(request);
     if (!auth.valid) {
       return createErrorResponse(auth.error || 'Unauthorized', 401);
@@ -63,7 +69,7 @@ export async function DELETE(
 
     await connectDB();
 
-    const project = await Project.findById(params.id);
+    const project = await Project.findById(id);
     if (!project) {
       return createErrorResponse('Project not found', 404);
     }
@@ -87,7 +93,7 @@ export async function DELETE(
     );
 
     // Delete project
-    await Project.findByIdAndDelete(params.id);
+    await Project.findByIdAndDelete(id);
 
     return createSuccessResponse({
       success: true,

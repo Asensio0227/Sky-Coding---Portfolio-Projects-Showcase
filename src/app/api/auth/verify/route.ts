@@ -12,7 +12,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const decoded = verifyJWT(token);
+    // IMPORTANT: await the verifyJWT call since it's async
+    const decoded = await verifyJWT(token);
 
     if (!decoded) {
       return NextResponse.json(
