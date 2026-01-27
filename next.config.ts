@@ -1,7 +1,15 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from 'next';
+import path from 'path';
+
+const nextConfig: NextConfig = {
   // bcryptjs is still needed for password hashing in API routes
   serverExternalPackages: ['bcryptjs'],
+
+  // Explicitly set Turbopack root to current project directory
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
+
   images: {
     remotePatterns: [
       {
@@ -19,11 +27,10 @@ const nextConfig = {
     ],
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false, // Changed to false - better to fix errors properly
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // Removed eslint config - no longer supported in next.config
+  // Use .eslintrc.json or eslint.config.js instead
 };
 
 export default nextConfig;

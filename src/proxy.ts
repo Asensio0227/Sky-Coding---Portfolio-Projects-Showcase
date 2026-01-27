@@ -2,11 +2,11 @@ import { verifyJWTEdge } from '@/lib/edge-auth';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const token = request.cookies.get('auth_token')?.value;
   const pathname = request.nextUrl.pathname;
 
-  console.log('🔍 Middleware Check:', {
+  console.log('🔒 Proxy Check:', {
     path: pathname,
     hasToken: !!token,
   });
@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
     }
 
     const decoded = await verifyJWTEdge(token);
-    console.log('🔑 Decoded token:', decoded);
+    console.log('🔓 Decoded token:', decoded);
 
     if (!decoded) {
       console.log('❌ Invalid token, redirecting to login');

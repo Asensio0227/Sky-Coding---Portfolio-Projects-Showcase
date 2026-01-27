@@ -1,4 +1,4 @@
-import { hashPassword, setAuthToken, signJWT } from '@/lib/auth';
+import { hashPassword, signJWT } from '@/lib/auth';
 import { connectDB } from '@/lib/db';
 import { User } from '@/models';
 import { NextRequest, NextResponse } from 'next/server';
@@ -65,9 +65,9 @@ export async function POST(req: NextRequest) {
 
     await newUser.save();
 
-    // Sign JWT
-    const token = signJWT({
-      id: newUser._id,
+    // IMPORTANT: await the signJWT call since it's async
+    const token = await signJWT({
+      id: newUser._id.toString(),
       email: newUser.email,
       role: newUser.role,
     });
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
     });
 
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Signup error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error' },

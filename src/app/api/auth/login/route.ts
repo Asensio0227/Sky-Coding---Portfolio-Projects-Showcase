@@ -35,8 +35,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const token = signJWT({
-      id: user._id,
+    // IMPORTANT: await the signJWT call since it's async
+    const token = await signJWT({
+      id: user._id.toString(),
       email: user.email,
       role: user.role,
     });
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest) {
     });
 
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Login error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
