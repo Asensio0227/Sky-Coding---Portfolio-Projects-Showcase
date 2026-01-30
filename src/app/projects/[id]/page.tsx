@@ -124,7 +124,7 @@ export default function ProjectDetailsPage() {
   return (
     <div className='footer section bg-gradient-to-b from-white via-gray-50 to-white min-h-screen'>
       {/* Back Button */}
-      <div className=' max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         <Link
           href='/projects'
           className='inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold text-lg transition-colors duration-300 hover:translate-x-1'
@@ -160,7 +160,7 @@ export default function ProjectDetailsPage() {
         </p>
       </section>
 
-      {/* Main Media Display */}
+      {/* Main Media Display - Full video without cutting */}
       <section className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 sm:mb-24'>
         <div className='relative bg-gray-900 rounded-2xl overflow-hidden group shadow-2xl'>
           {currentMedia.type === 'image' ? (
@@ -175,11 +175,12 @@ export default function ProjectDetailsPage() {
           ) : (
             <video
               src={currentMedia.url}
-              className='w-full h-auto object-cover'
+              className='w-full max-h-[70vh] object-contain'
               autoPlay
               loop
               muted
               playsInline
+              // controls
             />
           )}
 
