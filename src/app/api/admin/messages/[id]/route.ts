@@ -2,6 +2,7 @@
 import { verifyJWT } from '@/lib/auth';
 import { connectDB } from '@/lib/db';
 import { HttpError } from '@/lib/errors';
+import { getClientIp } from '@/lib/get-client-ip';
 import { logger } from '@/lib/logger';
 import { getRateLimiter } from '@/lib/rateLimiter';
 import Conversation from '@/models/Conversation';
@@ -10,9 +11,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const rateLimiter = getRateLimiter({ windowMs: 60000, max: 60 }); // 60 requests per minute
 
-function clientKey(request: NextRequest) {
-  const ip = request.headers.get('x-forwarded-for') || request.ip || 'unknown';
-  return ip;
+function clientKey(request: NextRequest): string {
+  return getClientIp(request);
 }
 
 interface MessageQuery {

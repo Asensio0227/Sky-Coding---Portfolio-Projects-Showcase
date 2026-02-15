@@ -6,7 +6,11 @@ function timestamp() {
   return new Date().toISOString();
 }
 
-function format(level: string, message: string, meta?: Record<string, any>) {
+function format(
+  level: string,
+  message: string,
+  meta?: Record<string, unknown>,
+) {
   const base = `[${timestamp()}] [${level}] ${message}`;
   if (meta) {
     try {
@@ -19,16 +23,17 @@ function format(level: string, message: string, meta?: Record<string, any>) {
 }
 
 export const logger = {
-  debug: (msg: string, meta?: Record<string, any>) => {
-    if (!env.isProd) console.debug(format('DEBUG', msg, meta));
+  debug: (msg: string, meta?: Record<string, unknown>) => {
+    if (env.NODE_ENV !== 'production')
+      console.debug(format('DEBUG', msg, meta));
   },
-  info: (msg: string, meta?: Record<string, any>) => {
+  info: (msg: string, meta?: Record<string, unknown>) => {
     console.info(format('INFO ', msg, meta));
   },
-  warn: (msg: string, meta?: Record<string, any>) => {
+  warn: (msg: string, meta?: Record<string, unknown>) => {
     console.warn(format('WARN ', msg, meta));
   },
-  error: (msg: string, meta?: Record<string, any>) => {
+  error: (msg: string, meta?: Record<string, unknown>) => {
     console.error(format('ERROR', msg, meta));
   },
 };

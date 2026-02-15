@@ -33,6 +33,8 @@ export interface JWTPayload {
   clientId?: string;
   role: 'client' | 'admin';
   email: string;
+  isActive?: boolean; // make required
+  subscriptionStatus?: 'active' | 'inactive' | 'cancelled'; // add this
   iat?: number;
   exp?: number;
 }
