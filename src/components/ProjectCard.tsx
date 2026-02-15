@@ -38,7 +38,7 @@ export default function ProjectCard({
           },
         ];
 
-  const primaryMedia = displayMedia[currentMediaIndex];
+  const primaryMedia = displayMedia[currentMediaIndex]!; // non-null because displayMedia always has at least one element
 
   const goToNext = () => {
     setCurrentMediaIndex((prev) => (prev + 1) % displayMedia.length);

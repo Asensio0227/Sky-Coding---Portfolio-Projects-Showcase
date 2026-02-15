@@ -1,14 +1,29 @@
 import { hashPassword, signJWT } from '@/lib/auth';
 import { connectDB } from '@/lib/db';
-import { User } from '@/models';
+import Client from '@/models/Client';
+import User from '@/models/User';
 import { NextRequest, NextResponse } from 'next/server';
 
+/**
+ * POST /api/auth/signup
+ * Creates a new client account with their client
+ * Multi-tenant: Each client gets exactly ONE client
+ */
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, password, confirmPassword } = await req.json();
+    const {
+      email,
+      password,
+      confirmPassword,
+      businessName,
+      domain,
+      businessType,
+    } = await req.json();
 
-    // Validation
-    if (!name || !email || !password || !confirmPassword) {
+    // =====================
+    // VALIDATION
+    // =====================
+    if (!email || !password || !confirmPassword || !businessName || !domain) {
       return NextResponse.json(
         { success: false, message: 'All fields are required' },
         { status: 400 },
@@ -37,9 +52,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // =====================
+    // NORMALIZE DOMAIN
+    // =====================
+    const normalizedDomain = domain
+      .toLowerCase()
+      .replace(/^(https?:\/\/)?(www\.)?/, '') // Remove protocol and www
+      .split('/')[0] // Remove paths
+      .trim();
+
+    // Validate domain format
+    const domainRegex = /^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,}$/;
+    if (!domainRegex.test(normalizedDomain)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            'Invalid domain format. Use format: example.com (no http, www, or paths)',
+        },
+        { status: 400 },
+      );
+    }
+
     await connectDB();
 
-    // Check if user already exists
+    // =====================
+    // CHECK EXISTING USER
+    // =====================
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return NextResponse.json(
@@ -48,47 +87,122 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Hash password
+    // =====================
+    // CHECK EXISTING DOMAIN
+    // =====================
+    const existingClient = await Client.findOne({
+      domain: normalizedDomain,
+    });
+    if (existingClient) {
+      return NextResponse.json(
+        { success: false, message: 'Domain already registered' },
+        { status: 409 },
+      );
+    }
+
+    // =====================
+    // CREATE USER (CLIENT)
+    // =====================
     const hashedPassword = await hashPassword(password);
 
-    // Create new user (first user is admin)
-    const userCount = await User.countDocuments();
-    const isFirstUser = userCount === 0;
-
     const newUser = new User({
-      name,
       email: email.toLowerCase(),
       password: hashedPassword,
-      role: isFirstUser ? 'admin' : 'user',
-      bio: `Hello from ${name}`,
+      role: 'client', // Always client for signup
+      isActive: true,
     });
 
     await newUser.save();
 
-    // IMPORTANT: await the signJWT call since it's async
-    const token = await signJWT({
-      id: newUser._id.toString(),
-      email: newUser.email,
-      role: newUser.role,
+    // =====================
+    // CREATE RESTAURANT
+    // =====================
+    const newPlan: 'starter' | 'business' | 'pro' = 'starter';
+    const newClient = new Client({
+      userId: newUser._id,
+      name: businessName.trim(),
+      domain: normalizedDomain,
+      allowedDomains: [normalizedDomain],
+      businessType: businessType || 'other',
+      plan: newPlan,
+      messageLimit: 1000,
+      usageCount: 0,
+      subscriptionStatus: 'active',
+      isActive: true,
+      chatbotConfig: {
+        welcomeMessage: `Hello! Welcome to ${businessName}. How can I help you today?`,
+        tone: 'friendly',
+        enabled: true,
+        primaryColor: '#3B82F6',
+        position: 'bottom-right',
+      },
     });
 
-    // Set cookie
-    const response = NextResponse.json(
+    await newClient.save();
+
+    // =====================
+    // LINK USER TO RESTAURANT
+    // =====================
+    newUser.clientId = newClient._id;
+    await newUser.save();
+
+    // =====================
+    // GENERATE JWT
+    // =====================
+    const token = await signJWT({
+      userId: newUser._id.toString(),
+      clientId: newClient._id.toString(),
+      role: newUser.role,
+      email: newUser.email,
+      isActive: newClient.isActive,
+      subscriptionStatus: newClient.subscriptionStatus,
+    });
+
+    // =====================
+    // PREPARE RESPONSE
+    // =====================
+    const response = NextResponse.json<{
+      success: boolean;
+      message: string;
+      data: {
+        id: string;
+        email: string;
+        role: 'client' | 'admin';
+        clientId: string;
+        client: {
+          id: string;
+          name: string;
+          domain: string;
+          clientId: string;
+          plan: string;
+        };
+        redirectUrl: string;
+      };
+    }>(
       {
         success: true,
         message: 'Account created successfully',
         data: {
-          id: newUser._id,
-          name: newUser.name,
+          id: newUser._id.toString(),
           email: newUser.email,
           role: newUser.role,
-          redirectUrl: isFirstUser ? '/admin' : '/',
+          clientId: newClient._id.toString(),
+          client: {
+            id: newClient._id.toString(),
+            name: newClient.name,
+            domain: newClient.domain,
+            clientId: newClient._id.toString(), // For chatbot integration
+            plan: newClient.plan,
+          },
+          redirectUrl: '/dashboard',
         },
       },
       { status: 201 },
     );
 
-    // Set secure httpOnly cookie
+    // =====================
+    // SET SECURE COOKIE
+    // =====================
     response.cookies.set({
       name: 'auth_token',
       value: token,
@@ -102,6 +216,15 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error: unknown) {
     console.error('Signup error:', error);
+
+    // Handle mongoose validation errors
+    if (error instanceof Error && error.name === 'ValidationError') {
+      return NextResponse.json(
+        { success: false, message: error.message },
+        { status: 400 },
+      );
+    }
+
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 },

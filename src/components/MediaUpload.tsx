@@ -45,14 +45,14 @@ export default function MediaUpload({
     setIsDragging(false);
 
     const files = e.dataTransfer.files;
-    if (files.length > 0) {
+    if (files.length > 0 && files[0]) {
       await uploadFile(files[0]);
     }
   };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files && files.length > 0) {
+    if (files && files.length > 0 && files[0]) {
       await uploadFile(files[0]);
     }
   };

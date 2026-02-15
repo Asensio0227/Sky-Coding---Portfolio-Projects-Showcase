@@ -19,7 +19,8 @@ import { Label } from '@/components/ui/label';
 export default function SignupPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    name: '',
+    businessName: '',
+    domain: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -46,8 +47,14 @@ export default function SignupPage() {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-        credentials: 'include', // Important: include cookies
+        body: JSON.stringify({
+          businessName: formData.businessName,
+          domain: formData.domain,
+          email: formData.email,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+        }),
+        credentials: 'include',
       });
 
       const data = await response.json();
@@ -59,12 +66,10 @@ export default function SignupPage() {
 
       console.log('Signup successful, redirecting to:', data.data?.redirectUrl);
 
-      // Small delay to ensure cookie is set
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Use window.location for hard navigation (ensures middleware runs)
       window.location.href = data.data?.redirectUrl || '/';
-    } catch (err: any) {
+    } catch (err) {
       console.error('Signup error:', err);
       setError('An error occurred. Please try again.');
     } finally {
@@ -74,11 +79,15 @@ export default function SignupPage() {
 
   return (
     <div className='footer section min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center px-4 py-16'>
-      <div className='section-center main w-full max-w-md'>
+      <div>
         <Card className='rounded-3xl shadow-2xl border border-white/20 bg-white/80 backdrop-blur-xl'>
           <CardHeader className='text-center space-y-4 pb-10'>
             <div className='mx-auto w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 shadow-lg'>
-              <span className='text-white font-bold text-2xl'>SC</span>
+              <img
+                src='/fav.svg'
+                alt='Sky Coding Logo'
+                className='w-12 h-12'
+              />{' '}
             </div>
 
             <CardTitle className='text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
@@ -86,7 +95,7 @@ export default function SignupPage() {
             </CardTitle>
 
             <CardDescription className='text-lg'>
-              Join Sky Coding today
+              Start your AI chatbot journey
             </CardDescription>
           </CardHeader>
 
@@ -103,18 +112,35 @@ export default function SignupPage() {
               onSubmit={handleSubmit}
               className='form py-20 align-middle my-30 space-y-8'
             >
-              {/* Name */}
+              {/* Business Name */}
               <div className='space-y-3'>
-                <Label className='label'>Full Name : </Label>
+                <Label className='label'>Business Name : </Label>
                 <Input
                   type='text'
-                  name='name'
-                  placeholder='John Doe'
-                  value={formData.name}
+                  name='businessName'
+                  placeholder='Beach Resort & Spa'
+                  value={formData.businessName}
                   onChange={handleChange}
                   required
                   className='input'
                 />
+              </div>
+
+              {/* Domain */}
+              <div className='space-y-3'>
+                <Label className='label'>Website Domain : </Label>
+                <Input
+                  type='text'
+                  name='domain'
+                  placeholder='beachresort.com'
+                  value={formData.domain}
+                  onChange={handleChange}
+                  required
+                  className='input'
+                />
+                <p className='text-xs text-muted-foreground mt-2'>
+                  Example: beachresort.com (no http or www)
+                </p>
               </div>
 
               {/* Email */}

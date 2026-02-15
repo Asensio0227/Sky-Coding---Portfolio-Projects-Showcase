@@ -1,5 +1,7 @@
+// load environment validation before anything else
 import type { NextConfig } from 'next';
 import path from 'path';
+import './src/lib/env';
 
 const nextConfig: NextConfig = {
   // bcryptjs is still needed for password hashing in API routes

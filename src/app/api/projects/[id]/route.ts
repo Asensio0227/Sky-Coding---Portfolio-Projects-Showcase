@@ -2,7 +2,8 @@
 import { verifyJWT } from '@/lib/auth';
 import { deleteFromCloudinary } from '@/lib/cloudinary';
 import { connectDB } from '@/lib/db';
-import { Project, User } from '@/models';
+import { Project } from '@/models';
+import User from '@/models/User';
 import { createErrorResponse, createSuccessResponse } from '@/utils/validation';
 import { NextRequest } from 'next/server';
 
@@ -63,7 +64,7 @@ export async function DELETE(
     const { id } = await params;
 
     const auth = await verifyAdmin(request);
-    if (!auth.valid) {
+    if (!auth.valid || !auth.user) {
       return createErrorResponse(auth.error || 'Unauthorized', 401);
     }
 

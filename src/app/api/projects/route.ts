@@ -1,7 +1,7 @@
-// app/api/projects/route.ts
 import { verifyJWT } from '@/lib/auth';
 import { connectDB } from '@/lib/db';
-import { Project, User } from '@/models';
+import { Project } from '@/models';
+import User from '@/models/User';
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -65,6 +65,9 @@ export async function POST(request: NextRequest) {
       return createErrorResponse(validation.errors.join(', '), 400);
     }
 
+    if (!auth.user) {
+      return createErrorResponse('Unauthorized', 401);
+    }
     const admin = await User.findById(auth.user.id);
     if (!admin) {
       return createErrorResponse('Admin user not found', 404);

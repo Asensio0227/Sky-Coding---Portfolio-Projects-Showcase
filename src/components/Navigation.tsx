@@ -2,18 +2,19 @@
 
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Navigation() {
   const pathname = usePathname();
-  const router = useRouter();
   const { user, loading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const isAuthenticated = !!user;
   const isAdmin = user?.role === 'admin';
+  const isClient = user?.role === 'client';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,22 +27,50 @@ export default function Navigation() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      // Reload the page to clear all state
+      setLoggingOut(true);
+
+      console.log('🔓 Initiating logout from navigation...');
+
+      // Call logout API to clear cookie
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      console.log('✅ Logout API called, clearing state...');
+
+      // Small delay to ensure cookie is cleared
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      console.log('🔄 Redirecting to home...');
+
+      // Hard redirect to clear all state
       window.location.href = '/';
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error('❌ Logout failed:', error);
+
+      // Even on error, try to redirect
+      window.location.href = '/';
+    } finally {
+      setLoggingOut(false);
     }
   };
 
+  // Build navigation links based on user role
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Projects', path: '/projects' },
+    { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
   ];
 
+  // Add role-specific links
   if (isAdmin) {
     navLinks.push({ name: 'Admin', path: '/admin' });
+  }
+
+  if (isClient) {
+    navLinks.push({ name: 'Dashboard', path: '/dashboard' });
   }
 
   return (
@@ -98,9 +127,17 @@ export default function Navigation() {
                   )}
                   <button
                     onClick={handleLogout}
-                    className='px-5 py-2.5 rounded-xl font-medium text-red-600 hover:bg-red-50 transition-all'
+                    disabled={loggingOut}
+                    className='px-5 py-2.5 rounded-xl font-medium text-red-600 hover:bg-red-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed'
                   >
-                    Logout
+                    {loggingOut ? (
+                      <span className='flex items-center gap-2'>
+                        <div className='w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin'></div>
+                        Logging out...
+                      </span>
+                    ) : (
+                      'Logout'
+                    )}
                   </button>
                 </div>
               ) : (
@@ -190,9 +227,10 @@ export default function Navigation() {
                       handleLogout();
                       setIsOpen(false);
                     }}
-                    className='w-full px-5 py-3 rounded-xl font-medium text-red-600 hover:bg-red-50 transition-all text-left'
+                    disabled={loggingOut}
+                    className='w-full px-5 py-3 rounded-xl font-medium text-red-600 hover:bg-red-50 transition-all text-left disabled:opacity-50'
                   >
-                    Logout
+                    {loggingOut ? 'Logging out...' : 'Logout'}
                   </button>
                 </>
               ) : (

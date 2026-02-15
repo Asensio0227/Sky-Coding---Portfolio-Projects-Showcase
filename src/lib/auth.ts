@@ -1,9 +1,9 @@
 import bcryptjs from 'bcryptjs';
-import { SignJWT, jwtVerify } from 'jose';
+import { JWTPayload, SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import { env } from './env';
 
-const JWT_SECRET =
-  process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = env.JWT_SECRET; // validated on import via zod
 const secret = new TextEncoder().encode(JWT_SECRET);
 const COOKIE_NAME = 'auth_token';
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60;
@@ -12,6 +12,26 @@ console.log(
   '🔑 JWT_SECRET loaded:',
   JWT_SECRET ? `${JWT_SECRET.substring(0, 10)}...` : 'MISSING!',
 );
+
+// ==================== TYPE DEFINITIONS ====================
+
+export interface JWTPayloadCustom extends JWTPayload {
+  id?: string;
+  email: string;
+  role: 'admin' | 'client';
+  clientId?: string;
+  userId?: string;
+  // additional tenant flags to avoid DB lookups in middleware
+  isActive?: boolean;
+  subscriptionStatus?: 'active' | 'past_due' | 'cancelled';
+}
+
+export interface AuthResponse<T = unknown> {
+  success: boolean;
+  message: string;
+  data?: T;
+  statusCode: number;
+}
 
 // Hash password
 export async function hashPassword(password: string): Promise<string> {
@@ -28,7 +48,7 @@ export async function verifyPassword(
 }
 
 // Sign JWT token (using jose for edge compatibility)
-export async function signJWT(payload: any): Promise<string> {
+export async function signJWT(payload: JWTPayloadCustom): Promise<string> {
   console.log('🔐 Signing JWT with payload:', payload);
 
   const token = await new SignJWT(payload)
@@ -41,7 +61,9 @@ export async function signJWT(payload: any): Promise<string> {
 }
 
 // Verify JWT token (using jose for edge compatibility)
-export async function verifyJWT(token: string): Promise<any> {
+export async function verifyJWT(
+  token: string,
+): Promise<JWTPayloadCustom | null> {
   try {
     console.log('🔐 Verifying JWT...');
     console.log('   Token exists:', !!token);
@@ -54,7 +76,7 @@ export async function verifyJWT(token: string): Promise<any> {
 
     const { payload } = await jwtVerify(token, secret);
     console.log('✅ JWT verified successfully:', payload);
-    return payload;
+    return payload as JWTPayloadCustom;
   } catch (error) {
     console.error('❌ JWT verification failed!');
     if (error instanceof Error) {
@@ -76,7 +98,7 @@ export async function setAuthToken(token: string): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: COOKIE_MAX_AGE,
     path: '/',
@@ -90,7 +112,7 @@ export async function clearAuthToken(): Promise<void> {
 }
 
 // Get current user from token
-export async function getCurrentUser() {
+export async function getCurrentUser(): Promise<JWTPayloadCustom | null> {
   const token = await getAuthToken();
   if (!token) return null;
 
@@ -101,12 +123,12 @@ export async function getCurrentUser() {
 }
 
 // Create auth response
-export function createAuthResponse(
+export function createAuthResponse<T = unknown>(
   success: boolean,
   message: string,
-  data?: any,
+  data?: T,
   statusCode: number = 200,
-) {
+): AuthResponse<T> {
   return {
     success,
     message,

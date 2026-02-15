@@ -113,5 +113,6 @@ export function ensureProjectMedia(project: Project): MediaItem[] {
  */
 export function getProjectThumbnail(project: Project): MediaItem {
   const media = ensureProjectMedia(project);
-  return media[0];
+  // ensureProjectMedia always returns at least one element
+  return media[0]!;
 }

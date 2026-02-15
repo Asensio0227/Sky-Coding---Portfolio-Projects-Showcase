@@ -1,6 +1,6 @@
 // app/api/profile/route.ts
 import { connectDB } from '@/lib/db';
-import { User } from '@/models';
+import User from '@/models/User';
 import { createErrorResponse, createSuccessResponse } from '@/utils/validation';
 import { NextRequest } from 'next/server';
 

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+/**
+ * POST /api/auth/logout
+ * Clears the authentication cookie
+ */
 export async function POST(req: NextRequest) {
   try {
     const response = NextResponse.json(
@@ -7,14 +11,16 @@ export async function POST(req: NextRequest) {
       { status: 200 },
     );
 
-    // Clear the auth token cookie
+    // =====================
+    // CLEAR AUTH COOKIE
+    // =====================
     response.cookies.set({
       name: 'auth_token',
       value: '',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 0,
+      maxAge: 0, // Expire immediately
       path: '/',
     });
 

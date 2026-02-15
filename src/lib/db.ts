@@ -10,7 +10,10 @@ const cached: CachedConnection = {
   promise: null,
 };
 
-const MONGO_URI = process.env.MONGO_URL;
+// pull from env validator so startup fails if missing
+import { env } from './env';
+
+const MONGO_URI = env.MONGO_URL;
 
 export async function connectDB() {
   // Check for MONGO_URI at runtime

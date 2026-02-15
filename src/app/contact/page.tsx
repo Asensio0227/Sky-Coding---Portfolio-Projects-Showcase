@@ -146,193 +146,197 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className='section footer bg-gradient-to-b from-white via-gray-50 to-white min-h-screen'>
-      {/* Page Header */}
-      <section className='max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-24 sm:py-32 lg:py-40'>
-        <div className='text-center'>
-          <span className='text-blue-600 font-semibold text-sm uppercase tracking-wider px-6 py-3 bg-blue-50 rounded-full inline-block mb-8'>
-            Get In Touch
-          </span>
-          <h1 className='text-4xl sm:text-5xl lg:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 mb-6 px-4'>
-            Let's Build Something Great Together
-          </h1>
-          <p className='text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed px-4'>
-            Have a project in mind? We'd love to hear from you. Let's discuss
-            how we can help bring your vision to life.
-          </p>
-        </div>
-      </section>
+    <article className='section footer'>
+      <div className='section-center bg-gradient-to-b from-white via-gray-50 to-white min-h-screen'>
+        {/* Page Header */}
+        <section className='max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-24 sm:py-32 lg:py-40'>
+          <div className='text-center'>
+            <span className='text-blue-600 font-semibold text-sm uppercase tracking-wider px-6 py-3 bg-blue-50 rounded-full inline-block mb-8'>
+              Get In Touch
+            </span>
+            <h1 className='text-4xl sm:text-5xl lg:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 mb-6 px-4'>
+              Let's Build Something Great Together
+            </h1>
+            <p className='text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed px-4'>
+              Have a project in mind? We'd love to hear from you. Let's discuss
+              how we can help bring your vision to life.
+            </p>
+          </div>
+        </section>
 
-      {/* Contact Methods */}
-      <section className='footer max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 mb-20'>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-          {contactMethods.map((method, index) => (
-            <a
-              key={index}
-              href={method.href}
-              target={method.href.startsWith('http') ? '_blank' : undefined}
-              rel={
-                method.href.startsWith('http')
-                  ? 'noopener noreferrer'
-                  : undefined
-              }
-              className='spacing group bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl hover:shadow-2xl border border-gray-100 p-10 sm:p-12 hover:border-blue-300 transition-all duration-300 flex items-start gap-6'
-            >
-              <div
-                className={`text-white bg-gradient-to-br ${method.color} p-5 rounded-2xl group-hover:scale-110 transition-transform duration-300 shadow-lg flex-shrink-0`}
-              >
-                {method.icon}
-              </div>
-              <div className='flex-1'>
-                <h3 className='text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors'>
-                  {method.title}
-                </h3>
-                <p className='text-gray-600 group-hover:text-blue-600 transition-colors duration-300 text-lg'>
-                  {method.description}
-                </p>
-              </div>
-              <svg
-                className='w-6 h-6 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all flex-shrink-0'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M9 5l7 7-7 7'
-                />
-              </svg>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* CONTACT FORM */}
-      <section className='form max-w-4xl mx-auto px-6 sm:px-10 pb-32'>
-        <Card className='rounded-3xl shadow-2xl border border-gray-200'>
-          <CardHeader className='text-center space-y-3 pb-10'>
-            <CardTitle className='text-4xl font-bold'>Send a Message</CardTitle>
-            <CardDescription className='text-lg'>
-              We usually respond within 24 hours
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className='space-y-10'>
-            {submitStatus && (
-              <Alert
-                className={`${
-                  submitStatus.type === 'success'
-                    ? 'border-green-300 bg-green-50'
-                    : 'border-red-300 bg-red-50'
-                }`}
-              >
-                <AlertDescription className='font-medium'>
-                  {submitStatus.message}
-                </AlertDescription>
-              </Alert>
-            )}
-
-            <form onSubmit={handleSubmit} className='spacing space-y-40'>
-              <div className='spacing grid grid-cols-1 md:grid-cols-2 gap-8'>
-                <div className='space-y-3'>
-                  <Label>Your Name</Label>
-                  <Input
-                    name='name'
-                    placeholder='John Doe'
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className='spacing'
-                  />
-                </div>
-
-                <div className='space-y-3'>
-                  <Label>Email Address</Label>
-                  <Input
-                    type='email'
-                    name='email'
-                    placeholder='john@example.com'
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className='spacing'
-                  />
-                </div>
-              </div>
-
-              <div className='space-y-3'>
-                <Label>Subject</Label>
-                <Input
-                  name='subject'
-                  placeholder='Project Inquiry'
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                  className='spacing'
-                />
-              </div>
-
-              <div className='space-y-3'>
-                <Label>Message</Label>
-                <Textarea
-                  rows={6}
-                  name='message'
-                  placeholder='Tell us about your project...'
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  className='spacing'
-                />
-              </div>
-
-              <Button
-                type='submit'
-                disabled={submitting}
-                className='w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:opacity-90'
-              >
-                {submitting ? 'Sending…' : 'Send Message'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Social Links Section */}
-      <section className='form footer max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pb-32'>
-        <div className='bg-gradient-to-br from-blue-50 via-purple-50 to-blue-50 rounded-3xl border border-gray-200 p-12 sm:p-16 text-center'>
-          <h2 className='text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-blue-600 mb-6'>
-            Connect With Us on Social Media
-          </h2>
-          <p className='spacing text-gray-700 text-lg mb-12 max-w-2xl mx-auto leading-relaxed'>
-            Follow us for the latest updates, project showcases, and tech
-            insights
-          </p>
-
-          <div className='flex flex-wrap justify-center gap-6 mb-8'>
-            {socialLinks.map((social, idx) => (
+        {/* Contact Methods */}
+        <section className='footer max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 mb-20'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+            {contactMethods.map((method, index) => (
               <a
-                key={idx}
-                href={social.href}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='spacing group flex flex-col items-center gap-3 px-8 py-6 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-110 min-w-[140px]'
-                title={social.name}
+                key={index}
+                href={method.href}
+                target={method.href.startsWith('http') ? '_blank' : undefined}
+                rel={
+                  method.href.startsWith('http')
+                    ? 'noopener noreferrer'
+                    : undefined
+                }
+                className='spacing group bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl hover:shadow-2xl border border-gray-100 p-10 sm:p-12 hover:border-blue-300 transition-all duration-300 flex items-start gap-6'
               >
                 <div
-                  className={`w-16 h-16 bg-gradient-to-br ${social.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}
+                  className={`text-white bg-gradient-to-br ${method.color} p-5 rounded-2xl group-hover:scale-110 transition-transform duration-300 shadow-lg flex-shrink-0`}
                 >
-                  <social.icon className='w-8 h-8 text-white' />
+                  {method.icon}
                 </div>
-                <span className='font-semibold text-gray-900 group-hover:text-blue-600 transition-colors'>
-                  {social.name}
-                </span>
+                <div className='flex-1'>
+                  <h3 className='text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors'>
+                    {method.title}
+                  </h3>
+                  <p className='text-gray-600 group-hover:text-blue-600 transition-colors duration-300 text-lg'>
+                    {method.description}
+                  </p>
+                </div>
+                <svg
+                  className='w-6 h-6 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all flex-shrink-0'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M9 5l7 7-7 7'
+                  />
+                </svg>
               </a>
             ))}
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+
+        {/* CONTACT FORM */}
+        <section className='form max-w-4xl mx-auto px-6 sm:px-10 pb-32'>
+          <Card className='rounded-3xl shadow-2xl border border-gray-200'>
+            <CardHeader className='text-center space-y-3 pb-10'>
+              <CardTitle className='text-4xl font-bold'>
+                Send a Message
+              </CardTitle>
+              <CardDescription className='text-lg'>
+                We usually respond within 24 hours
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className='space-y-10'>
+              {submitStatus && (
+                <Alert
+                  className={`${
+                    submitStatus.type === 'success'
+                      ? 'border-green-300 bg-green-50'
+                      : 'border-red-300 bg-red-50'
+                  }`}
+                >
+                  <AlertDescription className='font-medium'>
+                    {submitStatus.message}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <form onSubmit={handleSubmit} className='spacing space-y-40'>
+                <div className='spacing grid grid-cols-1 md:grid-cols-2 gap-8'>
+                  <div className='space-y-3'>
+                    <Label>Your Name</Label>
+                    <Input
+                      name='name'
+                      placeholder='John Doe'
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className='spacing'
+                    />
+                  </div>
+
+                  <div className='space-y-3'>
+                    <Label>Email Address</Label>
+                    <Input
+                      type='email'
+                      name='email'
+                      placeholder='john@example.com'
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className='spacing'
+                    />
+                  </div>
+                </div>
+
+                <div className='space-y-3'>
+                  <Label>Subject</Label>
+                  <Input
+                    name='subject'
+                    placeholder='Project Inquiry'
+                    value={formData.subject}
+                    onChange={handleChange}
+                    required
+                    className='spacing'
+                  />
+                </div>
+
+                <div className='space-y-3'>
+                  <Label>Message</Label>
+                  <Textarea
+                    rows={6}
+                    name='message'
+                    placeholder='Tell us about your project...'
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    className='spacing'
+                  />
+                </div>
+
+                <Button
+                  type='submit'
+                  disabled={submitting}
+                  className='w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:opacity-90'
+                >
+                  {submitting ? 'Sending…' : 'Send Message'}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Social Links Section */}
+        <section className='form footer max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pb-32'>
+          <div className='bg-gradient-to-br from-blue-50 via-purple-50 to-blue-50 rounded-3xl border border-gray-200 p-12 sm:p-16 text-center'>
+            <h2 className='text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-blue-600 mb-6'>
+              Connect With Us on Social Media
+            </h2>
+            <p className='spacing text-gray-700 text-lg mb-12 max-w-2xl mx-auto leading-relaxed'>
+              Follow us for the latest updates, project showcases, and tech
+              insights
+            </p>
+
+            <div className='flex flex-wrap justify-center gap-6 mb-8'>
+              {socialLinks.map((social, idx) => (
+                <a
+                  key={idx}
+                  href={social.href}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='spacing group flex flex-col items-center gap-3 px-8 py-6 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-110 min-w-[140px]'
+                  title={social.name}
+                >
+                  <div
+                    className={`w-16 h-16 bg-gradient-to-br ${social.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}
+                  >
+                    <social.icon className='w-8 h-8 text-white' />
+                  </div>
+                  <span className='font-semibold text-gray-900 group-hover:text-blue-600 transition-colors'>
+                    {social.name}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+    </article>
   );
 }

@@ -1,5 +1,6 @@
 import { hashPassword } from '@/lib/auth';
-import { Project, User } from '@/models';
+import { Project } from '@/models';
+import User from '@/models/User';
 import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGO_URL || '';
@@ -136,7 +137,7 @@ async function seedDatabase() {
       console.log(`✓ Created ${projects.length} default projects`);
 
       // Add projects to admin user
-      admin.projects = projects.map((p) => p._id);
+      admin.projects = projects.map((p: any) => p._id);
       await admin.save();
       console.log('✓ Associated projects with admin user');
     } else {

@@ -8,7 +8,8 @@ type User = {
   id: string;
   name?: string;
   email: string;
-  role: 'admin' | 'user';
+  role: 'admin' | 'user' | 'client';
+  clientId?: string;
   bio?: string;
   socialLinks?: SocialLinks;
 };
@@ -32,7 +33,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const fetchUser = async () => {
     try {
       console.log('🔄 AuthContext: Fetching user...');
-      const res = await fetch('/api/auth/me', {
+      const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+      const res = await fetch(`${base}/api/auth/me`, {
         credentials: 'include',
         cache: 'no-store',
       });

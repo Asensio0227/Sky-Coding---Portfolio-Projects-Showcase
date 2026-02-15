@@ -1,18 +1,17 @@
 import { v2 as cloudinary } from 'cloudinary';
 
-if (
-  !process.env.CLOUD_NAME ||
-  !process.env.CLOUD_API_KEY ||
-  !process.env.CLOUD_API_SECRET
-) {
-  throw new Error('Cloudinary environment variables are not defined');
+// don't throw during build; only configure at runtime when env vars exist
+const { CLOUD_NAME, CLOUD_API_KEY, CLOUD_API_SECRET, NODE_ENV } = process.env;
+if (CLOUD_NAME && CLOUD_API_KEY && CLOUD_API_SECRET) {
+  cloudinary.config({
+    cloud_name: CLOUD_NAME,
+    api_key: CLOUD_API_KEY,
+    api_secret: CLOUD_API_SECRET,
+  });
+} else {
+  // no credentials provided; library loads but operations will fail at runtime
+  console.warn('Cloudinary not configured; uploads functionality disabled');
 }
-
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.CLOUD_API_KEY,
-  api_secret: process.env.CLOUD_API_SECRET,
-});
 
 export interface UploadResponse {
   url: string;

@@ -2,6 +2,7 @@
 
 import { TechStack } from '@/components';
 import Hero from '@/components/Hero';
+import FeaturedSolutions from '@/components/home/FeaturedSolutions';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,7 +14,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowRight, Bot, Code2, Smartphone, Sparkles } from 'lucide-react';
+import { ArrowRight, Bot, Code2, Smartphone } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -28,6 +29,9 @@ interface Project {
   title: string;
   description: string;
   media: Media[];
+  featured?: boolean;
+  category?: string[];
+  tagline?: string;
 }
 
 export default function Home() {
@@ -39,7 +43,13 @@ export default function Home() {
       try {
         const response = await fetch('/api/projects');
         const data = await response.json();
-        setFeaturedProjects((data.data || []).slice(0, 3));
+
+        // Prioritize featured projects, then take first 3
+        const projects = data.data || [];
+        const featured = projects.filter((p: Project) => p.featured);
+        const remaining = projects.filter((p: Project) => !p.featured);
+
+        setFeaturedProjects([...featured, ...remaining].slice(0, 3));
       } catch (error) {
         console.error('Failed to fetch projects:', error);
       } finally {
@@ -52,11 +62,15 @@ export default function Home() {
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50'>
+      {/* Hero Section */}
       <Hero />
 
-      <section className='section-center'>
+      {/* Featured Solutions Section */}
+      <FeaturedSolutions />
+
+      <section className='main section-center'>
         {/* Featured Projects Section */}
-        <section className='py-32'>
+        <section className='py-20 md:py-32'>
           <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
             {/* Section Header */}
             <div className='text-center mb-20 space-y-4 flex flex-col items-center px-4'>
@@ -94,7 +108,16 @@ export default function Home() {
                   <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 w-full max-w-7xl'>
                     {featuredProjects.map((project) => (
                       <Link key={project._id} href={`/projects/${project._id}`}>
-                        <Card className='group overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border-none'>
+                        <Card className='group overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border-none relative'>
+                          {/* Featured Badge */}
+                          {project.featured && (
+                            <div className='absolute top-4 right-4 z-10'>
+                              <Badge className='bg-yellow-400 text-gray-900 hover:bg-yellow-500 shadow-lg'>
+                                ⭐ Featured
+                              </Badge>
+                            </div>
+                          )}
+
                           {/* Media Container */}
                           <div className='aspect-video overflow-hidden bg-gradient-to-br from-blue-100 to-purple-100 m-4 rounded-2xl'>
                             {project.media[0]?.type === 'video' ? (
@@ -120,9 +143,30 @@ export default function Home() {
                             <CardTitle className='text-2xl group-hover:text-blue-600 transition-colors'>
                               {project.title}
                             </CardTitle>
+                            {project.tagline && (
+                              <p className='text-sm text-muted-foreground italic mt-1'>
+                                {project.tagline}
+                              </p>
+                            )}
                           </CardHeader>
 
                           <CardContent>
+                            {/* Categories */}
+                            {project.category &&
+                              project.category.length > 0 && (
+                                <div className='flex flex-wrap gap-2 mb-3'>
+                                  {project.category.slice(0, 3).map((cat) => (
+                                    <Badge
+                                      key={cat}
+                                      variant='secondary'
+                                      className='text-xs'
+                                    >
+                                      {cat}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+
                             <CardDescription className='line-clamp-3 text-base'>
                               {project.description}
                             </CardDescription>
@@ -131,7 +175,7 @@ export default function Home() {
                           <CardFooter className='ml-6 place-items-center align-middle justify-center mb-6'>
                             <Button
                               variant='ghost'
-                              className='group-hover:translate-x-2 transition-transform text-blue-600 '
+                              className='group-hover:translate-x-2 transition-transform text-blue-600'
                             >
                               View Project
                               <ArrowRight className='ml-2 h-4 w-4' />
@@ -144,7 +188,7 @@ export default function Home() {
                 </div>
 
                 {/* View All Button */}
-                <div className='flex justify-center px-6 py-12 '>
+                <div className='flex justify-center px-6 py-12'>
                   <Button
                     asChild
                     size='lg'
@@ -165,7 +209,7 @@ export default function Home() {
         <TechStack />
 
         {/* Services Section */}
-        <section className='footer py-32 bg-gradient-to-br from-gray-50 to-blue-50'>
+        <section className='footer py-20 md:py-32 bg-gradient-to-br from-gray-50 to-blue-50'>
           <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
             {/* Section Header */}
             <div className='text-center mb-20 space-y-4 flex flex-col items-center px-4'>
@@ -234,7 +278,7 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        <section className='footer py-32 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 rounded-3xl mx-4'>
+        <section className='footer py-20 md:py-32 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 rounded-3xl mx-4'>
           <div className='max-w-5xl mx-auto px-8 sm:px-12 lg:px-16'>
             <div className='text-center space-y-10 flex flex-col items-center'>
               <h2 className='text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight px-6'>
